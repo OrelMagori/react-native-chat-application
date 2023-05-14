@@ -9,9 +9,11 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
+import { SelectList } from "react-native-dropdown-select-list";
 
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../config/firebase";
+import { ages } from "../ages";
 
 const gpclose = require("../assets/gpclose.png");
 
@@ -20,6 +22,7 @@ export default function Signup({ navigation }) {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [selected, setSelected] = React.useState("");
 
   const handleSignup = () => {
     if (email !== "" && password !== "") {
@@ -73,6 +76,13 @@ export default function Signup({ navigation }) {
           value={lastName}
           onChangeText={(text) => setLastName(text)}
         />
+        <SelectList
+          placeholder="Select your age"
+          setSelected={(val) => setSelected(val)}
+          data={ages}
+          save="value"
+          search={false}
+        />
         <TouchableOpacity style={styles.button} onPress={handleSignup}>
           <Text style={{ fontWeight: "bold", color: "#fff", fontSize: 18 }}>
             Sign Up
@@ -116,13 +126,15 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   input: {
-    backgroundColor: "#ffff",
     height: 58,
-    marginBottom: 20,
-    fontSize: 16,
-    borderRadius: 10,
     padding: 12,
+    fontSize: 16,
+    borderWidth: 1,
+    marginBottom: 20,
+    borderRadius: 10,
     borderStartWidth: 1,
+    borderColor: "gray",
+    backgroundColor: "#ffff",
   },
 
   backImage: {

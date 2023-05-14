@@ -4,6 +4,8 @@
 
 import React, { useEffect, useState } from "react";
 import { View, TouchableOpacity, Text, Image, StyleSheet } from "react-native";
+import { Entypo } from "@expo/vector-icons";
+import colors from "../colors";
 import { useNavigation } from "@react-navigation/native";
 import { getAuth, signOut } from "firebase/auth";
 const gpclose = require("../assets/gpclose.png");
@@ -32,14 +34,29 @@ const Home = () => {
   return (
     <>
       <View style={styles.container}>
-        <Image style={styles.image} source={gpclose} />
-        <Text style={styles.headerHelloUser}>Hello {userName}.</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Map")}>
-          <Text style={styles.routerHomePage}> Map</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleLogout}>
-          <Text style={styles.routerHomePage}> Logout</Text>
-        </TouchableOpacity>
+        <View style={{ alignItems: "center" }}>
+          <Image style={styles.image} source={gpclose} />
+          <Text style={styles.headerHelloUser}>Hello {userName}.</Text>
+        </View>
+        <View style={styles.chatButton}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Chat")}
+            style={styles.chatButton}
+          >
+            <Entypo name="chat" size={50} color={colors.black} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Map")}
+            style={styles.chatButton}
+          >
+            {/* <Text style={styles.routerHomePage}> Map</Text> */}
+            <Entypo name="location" size={50} color={colors.black} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleLogout} style={styles.chatButton}>
+            {/* <Text style={styles.routerHomePage}> Logout</Text> */}
+            <Entypo name="log-out" size={50} color={colors.black} />
+          </TouchableOpacity>
+        </View>
       </View>
     </>
   );
@@ -51,13 +68,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     // justifyContent: "center",
-    alignItems: "center",
     backgroundColor: "#ffff",
   },
   headerHelloUser: {
     marginTop: 100,
     justifyContent: "center",
-    alignItems: "center",
     fontSize: 30,
     fontWeight: "bold",
     color: "black",
@@ -75,5 +90,23 @@ const styles = StyleSheet.create({
     width: 230,
     height: 100,
     marginTop: 200,
+  },
+  chatButton: {
+    height: 50,
+    width: 50,
+    alignItems: "center",
+    flexDirection: "row",
+    marginTop: 150,
+    marginLeft: 45,
+    // borderRadius: 25,
+    // alignItems: "left",
+    // justifyContent: "left",
+    // shadowColor: colors.primary,
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 2,
+    // },
+    // shadowOpacity: 0.9,
+    // shadowRadius: 8,
   },
 });

@@ -5,10 +5,11 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./config/firebase";
 
+import Map from "./pages/Map";
+import Home from "./pages/Home";
+import Chat from "./pages/Chat";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Home from "./pages/Home";
-import Map from "./pages/Map";
 
 const Stack = createStackNavigator();
 const AuthenticatedUserContext = createContext({});
@@ -27,11 +28,13 @@ const AuthenticatedUserProvider = ({ children }) => {
 
 function HomeStack() {
   return (
-    <Stack.Navigator defaultScreenOptions={Home}
-    screenOptions={{ headerShown: false }}
+    <Stack.Navigator
+      defaultScreenOptions={Home}
+      screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="Map" component={Map} />
+      <Stack.Screen name="Chat" component={Chat} />
       {/* <Stack.Screen name="Logout" component={Login} /> */}
     </Stack.Navigator>
   );
