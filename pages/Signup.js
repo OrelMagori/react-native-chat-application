@@ -18,6 +18,8 @@ const gpclose = require("../assets/gpclose.png");
 export default function Signup({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
 
   const handleSignup = () => {
     if (email !== "" && password !== "") {
@@ -53,6 +55,24 @@ export default function Signup({ navigation }) {
           value={password}
           onChangeText={(text) => setPassword(text)}
         />
+        <TextInput
+          style={styles.input}
+          placeholder="First name"
+          autoCapitalize="none"
+          secureTextEntry={true}
+          autoCorrect={false}
+          value={firstName}
+          onChangeText={(text) => setFirstName(text)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Last name"
+          autoCapitalize="none"
+          secureTextEntry={true}
+          autoCorrect={false}
+          value={lastName}
+          onChangeText={(text) => setLastName(text)}
+        />
         <TouchableOpacity style={styles.button} onPress={handleSignup}>
           <Text style={{ fontWeight: "bold", color: "#fff", fontSize: 18 }}>
             Sign Up
@@ -86,7 +106,7 @@ export default function Signup({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0000",
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: 36,
