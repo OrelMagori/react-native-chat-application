@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import MapView, { Callout, Circle, Marker } from "react-native-maps";
-import { StyleSheet, View, Text } from "react-native";
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import Constants from "expo-constants";
 import { API_KEY } from "../env.json";
+import { StyleSheet, View, Text } from "react-native";
+import MapView, { Callout, Circle, Marker } from "react-native-maps";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
 
 
@@ -50,10 +49,21 @@ const Map = () =>{
             container: {
               flex: 0,
               position: "absolute",
-              width: "100%",
+              width: "95%",
               zIndex: 1,
+              alignItems: "center",
             },
             listView: { backgroundColor: "white" },
+            textInputContainer: {
+              alignItems: "center",
+              padding: 0,
+              justifyContent: "flex-start",
+              alignItems: "flex-start",
+            },
+            textInput: {
+              padding: 0,
+              margin: 0,
+              alignItems: "center",            },
           }}
         />
         <MapView
