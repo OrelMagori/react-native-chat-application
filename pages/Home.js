@@ -1,9 +1,14 @@
-/**
- * @abstract Our home app screen
- */
-
 import React, { useEffect, useState } from "react";
-import { View, TouchableOpacity, Text, Image, StyleSheet } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  Image,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
+import { collection, getDocs } from "firebase/firestore";
+import { auth, database } from "../config/firebase";
 import { Entypo } from "@expo/vector-icons";
 import colors from "../colors";
 import { useNavigation } from "@react-navigation/native";
@@ -14,8 +19,9 @@ const Home = () => {
   const navigation = useNavigation();
 
   const [userName, setuserName] = useState("");
+  const [userList, setUsersList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const auth = getAuth();
   const handleLogout = () =>
     signOut(auth)
       .then(() => {
@@ -26,38 +32,50 @@ const Home = () => {
       });
 
   useEffect(() => {
-    const email = auth.currentUser.email;
-    userNameTemp = email.substring(0, email.lastIndexOf("@"));
-    setuserName(userNameTemp);
-  }, [navigation]);
+    const getAllUsers = async () => {
+      const usersCollectionRef = collection(database, "users");
+      const data = await getDocs(usersCollectionRef);
+      setUsersList(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+      const getUser = userList.find((x) => x.uid === auth.currentUser.uid);
+      if (getUser) setuserName(getUser.firstName);
+      setIsLoading(false);
+    };
+    getAllUsers();
+  }, [userList]);
 
   return (
     <>
-      <View style={styles.container}>
-        <View style={{ alignItems: "center" }}>
-          <Image style={styles.image} source={gpclose} />
-          <Text style={styles.headerHelloUser}>Hello {userName}.</Text>
+      {!isLoading && userName ? (
+        <View style={styles.container}>
+          <View style={{ alignItems: "center" }}>
+            <Image style={styles.image} source={gpclose} />
+            <Text style={styles.headerHelloUser}>Hello {userName}.</Text>
+          </View>
+          <View style={styles.chatButton}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Chat")}
+              style={styles.chatButton}
+            >
+              <Entypo name="chat" size={50} color={colors.black} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Map")}
+              style={styles.chatButton}
+            >
+              {/* <Text style={styles.routerHomePage}> Map</Text> */}
+              <Entypo name="location" size={50} color={colors.black} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleLogout} style={styles.chatButton}>
+              {/* <Text style={styles.routerHomePage}> Logout</Text> */}
+              <Entypo name="log-out" size={50} color={colors.black} />
+            </TouchableOpacity>
+          </View>
         </View>
-        <View style={styles.chatButton}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Chat")}
-            style={styles.chatButton}
-          >
-            <Entypo name="chat" size={50} color={colors.black} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Map")}
-            style={styles.chatButton}
-          >
-            {/* <Text style={styles.routerHomePage}> Map</Text> */}
-            <Entypo name="location" size={50} color={colors.black} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleLogout} style={styles.chatButton}>
-            {/* <Text style={styles.routerHomePage}> Logout</Text> */}
-            <Entypo name="log-out" size={50} color={colors.black} />
-          </TouchableOpacity>
+      ) : (
+        <View style={[styles.container, styles.horizontal]}>
+          <ActivityIndicator size="large" color="black" />
         </View>
-      </View>
+      )}
     </>
   );
 };
@@ -67,7 +85,6 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: "center",
     backgroundColor: "#ffff",
   },
   headerHelloUser: {
@@ -76,13 +93,6 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: "bold",
     color: "black",
-    marginBottom: 20,
-  },
-  routerHomePage: {
-    marginTop: 10,
-    color: "darkblue",
-    fontWeight: "600",
-    fontSize: 24,
   },
   image: {
     alignItems: "center",
@@ -96,17 +106,12 @@ const styles = StyleSheet.create({
     width: 50,
     alignItems: "center",
     flexDirection: "row",
-    marginTop: 150,
+    marginTop: 120,
     marginLeft: 45,
-    // borderRadius: 25,
-    // alignItems: "left",
-    // justifyContent: "left",
-    // shadowColor: colors.primary,
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 2,
-    // },
-    // shadowOpacity: 0.9,
-    // shadowRadius: 8,
+  },
+  horizontal: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    padding: 10,
   },
 });

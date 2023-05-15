@@ -4,7 +4,7 @@ import React, {
   useLayoutEffect,
   useCallback,
 } from "react";
-import { TouchableOpacity, Text } from "react-native";
+import { TouchableOpacity, ImageBackground, StyleSheet } from "react-native";
 import { GiftedChat } from "react-native-gifted-chat";
 import {
   collection,
@@ -18,12 +18,12 @@ import { auth, database } from "../config/firebase";
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import colors from "../colors";
+import { Entypo } from "@expo/vector-icons";
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
   const navigation = useNavigation();
-  const chatBackground = require("../assets/chatBackground.jpg");
-  const gpclose = require("../assets/gpclose.png");
+  const chatBackground = { uri: "../assets/chatBackground.jpg" };
 
   const onSignOut = () => {
     signOut(auth).catch((error) => console.log("Error logging out: ", error));
@@ -38,10 +38,10 @@ export default function Chat() {
           }}
           onPress={onSignOut}
         >
-          <AntDesign
-            name="logout"
+          <Entypo
+            name="log-out"
             size={24}
-            color={colors.gray}
+            color={colors.black}
             style={{ marginRight: 10 }}
           />
         </TouchableOpacity>
@@ -87,22 +87,40 @@ export default function Chat() {
     //     <Text key={message._id}>{message.text}</Text>
     //   ))}
     // </>
-    <GiftedChat
-      messages={messages}
-      showAvatarForEveryMessage={false}
-      showUserAvatar={false}
-      onSend={(messages) => onSend(messages)}
-      messagesContainerStyle={{
-        backgroundImage: `url(${chatBackground})`,
-      }}
-      textInputStyle={{
-        backgroundColor: "#fff",
-        borderRadius: 20,
-      }}
-      user={{
-        _id: auth?.currentUser?.email,
-        avatar: "https://i.pravatar.cc/300",
-      }}
-    />
+    <>
+      <ImageBackground
+        source={{
+          uri: "https://cdn.pixabay.com/photo/2017/09/07/10/09/triangle-2724449_960_720.png",
+        }}
+        resizeMode="cover"
+        style={styles.image}
+      >
+        <GiftedChat
+          messages={messages}
+          showAvatarForEveryMessage={false}
+          showUserAvatar={false}
+          onSend={(messages) => onSend(messages)}
+          placeholder="    Message"
+          textInputStyle={{
+            backgroundColor: "white",
+            borderRadius: 25,
+            elevation: 2,
+            marginBottom: 10,
+          }}
+          style={{ backgroundColor: "transparent" }}
+          user={{
+            _id: auth?.currentUser?.email,
+            avatar: "https://i.pravatar.cc/300",
+          }}
+        />
+      </ImageBackground>
+    </>
   );
 }
+
+const styles = StyleSheet.create({
+  image: {
+    flex: 1,
+    justifyContent: "center",
+  },
+});
