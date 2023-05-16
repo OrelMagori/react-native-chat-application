@@ -12,9 +12,13 @@ import {
 } from "react-native";
 import { collection, addDoc } from "firebase/firestore";
 import { SelectList } from "react-native-dropdown-select-list";
+import { Entypo } from "@expo/vector-icons";
+import colors from "../colors";
+import * as DocumentPicker from "expo-document-picker";
 
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, database } from "../config/firebase";
+import { auth, database, storage } from "../config/firebase";
+import { ref, uploadBytes } from "firebase/storage";
 import { ages } from "../ages";
 
 const gpclose = require("../assets/gpclose.png");
@@ -24,8 +28,46 @@ export default function Signup({ navigation }) {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [selected, setSelected] = React.useState("");
+  const [selected, setSelected] = useState("");
   const [users] = useState([]);
+  const [selectedFile, setSelectedFile] = useState("");
+
+  const submitImage = () => {
+    const storageRef = ref(storage, "images");
+    // 'file' comes from the Blob or File API
+    uploadBytes(storageRef, selectedFile)
+      .then((snapshot) => {
+        console.log("Uploaded a blob or file!");
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  };
+
+  // const handleImageUpload = async (e) => {
+  //   if (e.target.files[0]) {
+  //     setSelectedFile(e.target.files[0]);
+  //   }
+  // };
+
+  const handleFileUpload = async () => {
+    try {
+      const file = await DocumentPicker.getDocumentAsync();
+      if (file.type === "success") {
+        setSelectedFile(e.target.files[0]);
+        // Do something with the selected file
+        console.log("Selected file:", file);
+      }
+    } catch (error) {
+      console.log("Error selecting file:", error);
+    }
+  };
+
+  const handleDeleteFile = () => {
+    setSelectedFile(null);
+    // Perform any additional actions when deleting the file
+    console.log("File deleted");
+  };
 
   const handleSignup = () => {
     if (
@@ -59,6 +101,10 @@ export default function Signup({ navigation }) {
     } else {
       Alert.alert("Error in Signup", "The fields must be filled");
     }
+  };
+  const handleSubmit = () => {
+    submitImage();
+    handleSignup();
   };
 
   return (
@@ -107,7 +153,33 @@ export default function Signup({ navigation }) {
             save="value"
             // search={false}
           />
-          <TouchableOpacity style={styles.button} onPress={handleSignup}>
+          <TouchableOpacity
+            style={styles.fileButton}
+            onPress={handleFileUpload}
+          >
+            <Text
+              style={{ fontWeight: "bold", color: "darkblue", fontSize: 18 }}
+            >
+              <Entypo name="attachment" size={25} color={colors.black} /> Choose
+              a picture
+            </Text>
+          </TouchableOpacity>
+          {selectedFile && (
+            <View style={styles.selectedFileContainer}>
+              <TextInput
+                style={styles.selectedFileInput}
+                value={selectedFile.name}
+                editable={false}
+              />
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={handleDeleteFile}
+              >
+                <Entypo name="cross" size={25} color="red" />
+              </TouchableOpacity>
+            </View>
+          )}
+          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
             <Text style={{ fontWeight: "bold", color: "#fff", fontSize: 18 }}>
               Sign Up
             </Text>
@@ -151,7 +223,7 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   input: {
-    height: 58,
+    height: 50, //58
     padding: 12,
     fontSize: 16,
     borderWidth: 1,
@@ -183,11 +255,21 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "darkblue",
-    height: 58,
+    height: 50,
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 40,
+  },
+  fileButton: {
+    backgroundColor: "#fff",
+    height: 50,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+    borderColor: "darkblue",
+    borderWidth: 1,
   },
   scrollView: {
     marginHorizontal: 20,

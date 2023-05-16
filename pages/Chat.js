@@ -16,14 +16,35 @@ import {
 import { signOut } from "firebase/auth";
 import { auth, database } from "../config/firebase";
 import { useNavigation } from "@react-navigation/native";
-import { AntDesign } from "@expo/vector-icons";
 import colors from "../colors";
 import { Entypo } from "@expo/vector-icons";
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
   const navigation = useNavigation();
-  const chatBackground = { uri: "../assets/chatBackground.jpg" };
+  const [userAvatar, setUserAvatar] = useState(null);
+
+  useEffect(() => {
+    const fetchUserAvatar = async () => {
+      try {
+        const imageUrl = await getImageUrl(avatar);
+        setUserAvatar(imageUrl);
+      } catch (error) {
+        console.log("Error retrieving user avatar:", error);
+      }
+    };
+    fetchUserAvatar();
+  }, []);
+
+  const getImageUrl = async (imageName) => {
+    try {
+      const url = await storage.ref().child(imageName).getDownloadURL();
+      return url;
+    } catch (error) {
+      console.log("Error retrieving image URL:", error);
+      return null;
+    }
+  };
 
   const onSignOut = () => {
     signOut(auth).catch((error) => console.log("Error logging out: ", error));
@@ -90,7 +111,7 @@ export default function Chat() {
     <>
       <ImageBackground
         source={{
-          uri: "https://cdn.pixabay.com/photo/2017/09/07/10/09/triangle-2724449_960_720.png",
+          uri: "https://images.pexels.com/photos/3695238/pexels-photo-3695238.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
         }}
         resizeMode="cover"
         style={styles.image}
@@ -110,7 +131,7 @@ export default function Chat() {
           style={{ backgroundColor: "transparent" }}
           user={{
             _id: auth?.currentUser?.email,
-            avatar: "https://i.pravatar.cc/300",
+            avatar: userAvatar,
           }}
         />
       </ImageBackground>
