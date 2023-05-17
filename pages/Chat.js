@@ -27,7 +27,7 @@ export default function Chat() {
   useEffect(() => {
     const fetchUserAvatar = async () => {
       try {
-        const imageUrl = await getImageUrl(avatar);
+        const imageUrl = await getImageUrl(imageName);
         setUserAvatar(imageUrl);
       } catch (error) {
         console.log("Error retrieving user avatar:", error);
