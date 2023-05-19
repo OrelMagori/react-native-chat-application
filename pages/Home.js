@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  TouchableOpacity,
   Text,
+  View,
   Image,
   StyleSheet,
+  TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
 import { collection, getDocs } from "firebase/firestore";
@@ -50,25 +50,6 @@ const Home = () => {
           <View style={{ alignItems: "center" }}>
             <Image style={styles.image} source={gpclose} />
             <Text style={styles.headerHelloUser}>Hello {userName}.</Text>
-          </View>
-          <View style={styles.chatButton}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Chat")}
-              style={styles.chatButton}
-            >
-              <Entypo name="chat" size={50} color={colors.black} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Map")}
-              style={styles.chatButton}
-            >
-              {/* <Text style={styles.routerHomePage}> Map</Text> */}
-              <Entypo name="location" size={50} color={colors.black} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleLogout} style={styles.chatButton}>
-              {/* <Text style={styles.routerHomePage}> Logout</Text> */}
-              <Entypo name="log-out" size={50} color={colors.black} />
-            </TouchableOpacity>
           </View>
         </View>
       ) : (

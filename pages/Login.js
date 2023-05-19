@@ -32,7 +32,6 @@ export default function Login({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.whiteSheet} />
-      {/* <Image style={styles.backImage} source={backgroungImage} /> */}
       <SafeAreaView style={styles.form}>
         <Text style={styles.title}>Login</Text>
         <TextInput
@@ -107,14 +106,6 @@ const styles = StyleSheet.create({
     padding: 12,
     borderStartWidth: 1,
   },
-
-  // backImage: {
-  //   alignSelf: "center",
-  //   zIndex: -1,
-  //   width: 500,
-  //   height: 400,
-  //   marginTop: 70,
-  // },
   whiteSheet: {
     width: "100%",
     height: "75%",
@@ -127,7 +118,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     marginHorizontal: 30,
-    // paddingTop: Platform.OS === "android" ? StatusBarManager.HEIGHT : 0,
+    paddingTop: Platform.OS === "android" ? StatusBarManager.HEIGHT : 0,
   },
   button: {
     backgroundColor: "darkblue",

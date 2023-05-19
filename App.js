@@ -1,20 +1,29 @@
-import React, { useState, createContext, useContext, useEffect } from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { View, ActivityIndicator, ImageBackground } from "react-native";
+import React, {
+  useState,
+  createContext,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+} from "react";
+import colors from "./colors";
+import { Entypo } from "@expo/vector-icons";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./config/firebase";
+import { View, ActivityIndicator } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
+import Map from "./pages/Map";
+import Home from "./pages/Home";
+import Chat from "./pages/Chat";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Chat from "./pages/Chat";
-import Home from "./pages/Home";
-import Map from "./pages/Map";
+import { auth } from "./config/firebase";
 
-const Stack = createStackNavigator();
 const AuthenticatedUserContext = createContext({});
-const chatBackground = { uri: "../assets/chatBackground.jpg" };
+
 const AuthenticatedUserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+
   return (
     <AuthenticatedUserContext.Provider value={{ user, setUser }}>
       {children}
@@ -22,24 +31,71 @@ const AuthenticatedUserProvider = ({ children }) => {
   );
 };
 
+const Tab = createBottomTabNavigator();
 function ChatStack() {
   return (
-    <Stack.Navigator defaultScreenOptions={Home}>
-      <Stack.Screen name="Home" component={Home} />
-      <Stack.Screen name="Map" component={Map} />
-      <Stack.Screen name="Chat" component={Chat} />
-    </Stack.Navigator>
+    <Tab.Navigator defaultScreenOptions={Home}>
+      <Tab.Screen
+        name="Chat"
+        component={Chat}
+        options={{
+          tabBarLabel: "Chat",
+          tabBarIcon: () => (
+            <Entypo name="chat" size={25} color={colors.black} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{
+          tabBarLabel: "Home",
+          tabBarIcon: () => (
+            <Entypo name="home" size={25} color={colors.black} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Map"
+        component={Map}
+        options={{
+          tabBarLabel: "Map",
+          tabBarIcon: () => (
+            <Entypo name="map" size={25} color={colors.black} />
+          ),
+        }}
+      />
+    </Tab.Navigator>
   );
 }
 
 function AuthStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Signup" component={Signup} />
-    </Stack.Navigator>
+    <Tab.Navigator screenOptions={{ headerShown: false }}>
+      <Tab.Screen
+        name="Login"
+        component={Login}
+        options={{
+          tabBarLabel: "Login",
+          tabBarIcon: () => (
+            <Entypo name="login" size={25} color={colors.black} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Signup"
+        component={Signup}
+        options={{
+          tabBarLabel: "Signup",
+          tabBarIcon: () => (
+            <Entypo name="add-user" size={25} color={colors.black} />
+          ),
+        }}
+      />
+    </Tab.Navigator>
   );
 }
+
 function RootNavigator() {
   const { user, setUser } = useContext(AuthenticatedUserContext);
   const [isLoading, setIsLoading] = useState(true);
@@ -65,7 +121,7 @@ function RootNavigator() {
 
   return (
     <NavigationContainer>
-        {user ? <ChatStack /> : <AuthStack />}
+      {user ? <ChatStack /> : <AuthStack />}
     </NavigationContainer>
   );
 }
@@ -77,3 +133,4 @@ export default function App() {
     </AuthenticatedUserProvider>
   );
 }
+
