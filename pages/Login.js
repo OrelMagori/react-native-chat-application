@@ -1,26 +1,22 @@
 import React, { useState } from "react";
 import {
-  StyleSheet,
   Text,
   View,
   TextInput,
-  Image,
   SafeAreaView,
   TouchableOpacity,
-  StatusBar,
   Alert,
-  NativeModules,
 } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../config/firebase";
 
-const backgroungImage = require("../assets/backgroungImage.jpg");
-const { StatusBarManager } = NativeModules;
+import { auth } from "../config/firebase";
+import { styles } from "../pagesStyle/Login.style";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // this handleLogin function is used to login the user
   const handleLogin = () => {
     if (email !== "" && password !== "") {
       signInWithEmailAndPassword(auth, email, password)
@@ -84,48 +80,3 @@ export default function Login({ navigation }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0000",
-  },
-  title: {
-    fontSize: 36,
-    fontWeight: "bold",
-    color: "darkblue",
-    alignSelf: "center",
-    paddingBottom: 24,
-  },
-  input: {
-    backgroundColor: "#ffff",
-    height: 58,
-    marginBottom: 20,
-    fontSize: 16,
-    borderRadius: 10,
-    padding: 12,
-    borderStartWidth: 1,
-  },
-  whiteSheet: {
-    width: "100%",
-    height: "75%",
-    position: "absolute",
-    bottom: 0,
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 60,
-  },
-  form: {
-    flex: 1,
-    justifyContent: "center",
-    marginHorizontal: 30,
-    paddingTop: Platform.OS === "android" ? StatusBarManager.HEIGHT : 0,
-  },
-  button: {
-    backgroundColor: "darkblue",
-    height: 58,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 40,
-  },
-});

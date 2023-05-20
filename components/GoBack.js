@@ -1,35 +1,30 @@
 import React, { useLayoutEffect } from "react";
-import { signOut } from "firebase/auth";
-import { auth } from "../config/firebase";
 import { useNavigation } from "@react-navigation/native";
 import { TouchableOpacity } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import colors from "../colors";
 
-export const Signout = () => {
+export const GoBack = () => {
   const navigation = useNavigation();
 
-  const onSignOut = () => {
-    signOut(auth).catch((error) => console.log("Error logging out: ", error));
+  const GoToHomePage = () => {
+    navigation.navigate("Home");
   };
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          style={{
-            marginRight: 10,
-          }}
-          onPress={onSignOut}
-        >
+      headerLeft: () => (
+        <TouchableOpacity style={{ marginLeft: 10 }} onPress={GoToHomePage}>
           <Entypo
-            name="log-out"
+            name="chevron-thin-left"
             size={24}
             color={colors.black}
-            style={{ marginRight: 10 }}
+            style={{ marginLeft: 10 }}
           />
         </TouchableOpacity>
       ),
     });
   }, [navigation]);
+
+  return null; // Since this component only modifies the header, it doesn't need to render any content
 };

@@ -1,29 +1,30 @@
-import React, {
-  useState,
-  createContext,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-} from "react";
-import colors from "./colors";
+import React, { useState, createContext, useContext, useEffect } from "react";
 import { Entypo } from "@expo/vector-icons";
 import { onAuthStateChanged } from "firebase/auth";
-import { View, ActivityIndicator } from "react-native";
+import {
+  View,
+  ActivityIndicator,
+  Keyboard,
+  KeyboardAvoidingView,
+} from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
+import colors from "./colors";
 import Map from "./pages/Map";
 import Home from "./pages/Home";
 import Chat from "./pages/Chat";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import { auth } from "./config/firebase";
+// import { AuthStack } from "./components/AuthStack";
+// import { ChatStack } from './components/ChatStack';
 
 const AuthenticatedUserContext = createContext({});
-
 const AuthenticatedUserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
+  // this return is the value of the context provider
   return (
     <AuthenticatedUserContext.Provider value={{ user, setUser }}>
       {children}
@@ -32,9 +33,15 @@ const AuthenticatedUserProvider = ({ children }) => {
 };
 
 const Tab = createBottomTabNavigator();
+// the function is the navigation for the app
 function ChatStack() {
   return (
-    <Tab.Navigator defaultScreenOptions={Home}>
+    <Tab.Navigator
+      defaultScreenOptions={Home}
+      tabBarOptions={{
+        keyboardHidesTabBar: true,
+      }}
+    >
       <Tab.Screen
         name="Chat"
         component={Chat}
@@ -69,36 +76,77 @@ function ChatStack() {
   );
 }
 
+// // the function is the navigation for the login and signup pages
 function AuthStack() {
+  const [keyboardShown, setKeyboardShown] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setKeyboardShown(true);
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setKeyboardShown(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
-      <Tab.Screen
-        name="Login"
-        component={Login}
-        options={{
-          tabBarLabel: "Login",
-          tabBarIcon: () => (
-            <Entypo name="login" size={25} color={colors.black} />
-          ),
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+      keyboardShouldPersistTaps="handled"
+    >
+      <Tab.Navigator
+        screenOptions={{ headerShown: false }}
+        tabBarOptions={{
+          keyboardHidesTabBar: true,
+          style: {
+            position: keyboardShown ? "absolute" : "relative",
+            bottom: keyboardShown ? 0 : null,
+          },
         }}
-      />
-      <Tab.Screen
-        name="Signup"
-        component={Signup}
-        options={{
-          tabBarLabel: "Signup",
-          tabBarIcon: () => (
-            <Entypo name="add-user" size={25} color={colors.black} />
-          ),
-        }}
-      />
-    </Tab.Navigator>
+      >
+        <Tab.Screen
+          name="Login"
+          component={Login}
+          options={{
+            tabBarLabel: "Login",
+            tabBarIcon: () => (
+              <Entypo name="login" size={25} color={colors.black} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Signup"
+          component={Signup}
+          options={{
+            tabBarLabel: "Signup",
+            tabBarIcon: () => (
+              <Entypo name="add-user" size={25} color={colors.black} />
+            ),
+          }}
+        />
+      </Tab.Navigator>
+    </KeyboardAvoidingView>
   );
 }
 
+// the function is the root navigation for the app
 function RootNavigator() {
   const { user, setUser } = useContext(AuthenticatedUserContext);
   const [isLoading, setIsLoading] = useState(true);
+
+  // the function is the listener for the user authentication
   useEffect(() => {
     // onAuthStateChanged returns an unsubscriber
     const unsubscribeAuth = onAuthStateChanged(
@@ -133,4 +181,3 @@ export default function App() {
     </AuthenticatedUserProvider>
   );
 }
-
