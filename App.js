@@ -1,12 +1,12 @@
 import React, { useState, createContext, useContext, useEffect } from "react";
-import { Entypo } from "@expo/vector-icons";
-import { onAuthStateChanged } from "firebase/auth";
 import {
   View,
   ActivityIndicator,
   Keyboard,
   KeyboardAvoidingView,
 } from "react-native";
+import { Entypo } from "@expo/vector-icons";
+import { onAuthStateChanged } from "firebase/auth";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
@@ -43,22 +43,22 @@ function ChatStack() {
       }}
     >
       <Tab.Screen
-        name="Chat"
-        component={Chat}
-        options={{
-          tabBarLabel: "Chat",
-          tabBarIcon: () => (
-            <Entypo name="chat" size={25} color={colors.black} />
-          ),
-        }}
-      />
-      <Tab.Screen
         name="Home"
         component={Home}
         options={{
           tabBarLabel: "Home",
           tabBarIcon: () => (
             <Entypo name="home" size={25} color={colors.black} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Chat"
+        component={Chat}
+        options={{
+          tabBarLabel: "Chat",
+          tabBarIcon: () => (
+            <Entypo name="chat" size={25} color={colors.black} />
           ),
         }}
       />
@@ -76,10 +76,11 @@ function ChatStack() {
   );
 }
 
-// // the function is the navigation for the login and signup pages
+// the function is the navigation for the login and signup pages
 function AuthStack() {
   const [keyboardShown, setKeyboardShown] = useState(false);
 
+  // the useEffect is hide the tab bar when the keyboard is shown.
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
@@ -100,6 +101,7 @@ function AuthStack() {
       keyboardDidHideListener.remove();
     };
   }, []);
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -107,13 +109,15 @@ function AuthStack() {
       keyboardShouldPersistTaps="handled"
     >
       <Tab.Navigator
-        screenOptions={{ headerShown: false }}
-        tabBarOptions={{
-          keyboardHidesTabBar: true,
-          style: {
-            position: keyboardShown ? "absolute" : "relative",
-            bottom: keyboardShown ? 0 : null,
-          },
+        screenOptions={{
+          headerShown: false,
+          tabBarHideOnKeyboard: true,
+          tabBarStyle: [
+            {
+              display: "flex",
+            },
+            null,
+          ],
         }}
       >
         <Tab.Screen

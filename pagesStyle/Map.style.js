@@ -9,23 +9,23 @@ export const styles = StyleSheet.create({
     height: "100%",
   },
   googlePlacesAutocompleteContainer: {
-    position: "absolute",
     left: 10,
-    right: 10,
     zIndex: 1,
+    right: 10,
+    position: "absolute",
   },
   googlePlacesAutocompleteListView: {
     backgroundColor: "white",
   },
   googlePlacesAutocompleteTextInputContainer: {
-    alignItems: "center",
     padding: 0,
-    justifyContent: "flex-start",
+    alignItems: "center",
     alignItems: "flex-start",
+    justifyContent: "flex-start",
   },
   googlePlacesAutocompleteTextInput: {
-    padding: 0,
     margin: 0,
+    padding: 0,
     alignItems: "center",
   },
 });

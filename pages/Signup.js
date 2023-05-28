@@ -41,7 +41,7 @@ export default function Signup({ navigation }) {
             const randomNumber = Math.floor(Math.random() * 1000) + 1;
             const numberAvatar = randomNumber;
             await addDoc(collection(database, "users"), {
-              uid: user.uid,
+              uid: user?.uid,
               email,
               firstName,
               lastName,

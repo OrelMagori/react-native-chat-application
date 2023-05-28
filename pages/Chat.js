@@ -41,7 +41,7 @@ export default function Chat() {
   useEffect(() => {
     const currentUser = auth.currentUser;
     if (currentUser) {
-      const getUser = userList.find((user) => user.uid === currentUser.uid);
+      const getUser = userList.find((user) => user?.uid === currentUser?.uid);
       if (getUser) {
         setAvatarNumber(getUser.numberAvatar);
       }
@@ -110,6 +110,7 @@ export default function Chat() {
       <ImageBackground
         source={{
           uri: "https://images.pexels.com/photos/3695238/pexels-photo-3695238.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+          // uri: "https://cdn.pixabay.com/photo/2018/03/15/08/54/grid-3227459_960_720.jpg",
         }}
         resizeMode="cover"
         style={styles.image}

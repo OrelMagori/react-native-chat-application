@@ -1,7 +1,8 @@
 import React, { useLayoutEffect } from "react";
-import { useNavigation } from "@react-navigation/native";
-import { TouchableOpacity } from "react-native";
 import { Entypo } from "@expo/vector-icons";
+import { TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+
 import colors from "../colors";
 
 export const GoBack = () => {

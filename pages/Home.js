@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, Image, ActivityIndicator } from "react-native";
 import { collection, getDocs } from "firebase/firestore";
-import { auth, database } from "../config/firebase";
+import { Text, View, Image, ActivityIndicator } from "react-native";
+
 import { Signout } from "../components/Signout";
 import { styles } from "../pagesStyle/Home.style";
+import { auth, database } from "../config/firebase";
 
 const Home = () => {
   const [userName, setuserName] = useState("");
@@ -16,7 +17,7 @@ const Home = () => {
       const usersCollectionRef = collection(database, "users");
       const data = await getDocs(usersCollectionRef);
       setUsersList(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-      const getUser = userList.find((x) => x.uid === auth.currentUser.uid);
+      const getUser = userList.find((x) => x?.uid === auth.currentUser?.uid);
       if (getUser) setuserName(getUser.firstName);
       setIsLoading(false);
     };
