@@ -4,8 +4,6 @@ import React, {
   useLayoutEffect,
   useCallback,
 } from "react";
-import { TouchableOpacity, ImageBackground, StyleSheet } from "react-native";
-import { GiftedChat } from "react-native-gifted-chat";
 import {
   collection,
   addDoc,
@@ -13,46 +11,49 @@ import {
   query,
   onSnapshot,
 } from "firebase/firestore";
-import { signOut } from "firebase/auth";
-import { auth, database } from "../config/firebase";
-import { useNavigation } from "@react-navigation/native";
-import { AntDesign } from "@expo/vector-icons";
-import colors from "../colors";
 import { Entypo } from "@expo/vector-icons";
+import { View, ImageBackground } from "react-native";
+import { GiftedChat, Send, Composer } from "react-native-gifted-chat";
+
+import colors from "../colors";
+import { GoBack } from "../components/GoBack";
+import { Signout } from "../components/Signout";
+import { styles } from "../pagesStyle/Chat.style";
+import { auth, database } from "../config/firebase";
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
-  const navigation = useNavigation();
-  const chatBackground = { uri: "../assets/chatBackground.jpg" };
+  const [avatarNumber, setAvatarNumber] = useState(0);
+  const [userList, setUsersList] = useState([]);
 
-  const onSignOut = () => {
-    signOut(auth).catch((error) => console.log("Error logging out: ", error));
-  };
-
+  // the function get the users list
   useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          style={{
-            marginRight: 10,
-          }}
-          onPress={onSignOut}
-        >
-          <Entypo
-            name="log-out"
-            size={24}
-            color={colors.black}
-            style={{ marginRight: 10 }}
-          />
-        </TouchableOpacity>
-      ),
+    const collectionRef = collection(database, "users");
+    const unsubscribe = onSnapshot(collectionRef, (querySnapshot) => {
+      const users = querySnapshot.docs.map((doc) => doc.data());
+      setUsersList(users);
     });
-  }, [navigation]);
 
+    return unsubscribe;
+  }, []);
+
+  // the function get the avatar random number
+  useEffect(() => {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      const getUser = userList.find((user) => user?.uid === currentUser?.uid);
+      if (getUser) {
+        setAvatarNumber(getUser.numberAvatar);
+      }
+    }
+  }, [userList]);
+
+  // the function get the messages from the database
   useLayoutEffect(() => {
     const collectionRef = collection(database, "chats");
     const q = query(collectionRef, orderBy("createdAt", "desc"));
 
+    // Listen for snapshot events
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       console.log("querySnapshot unsusbscribe");
       setMessages(
@@ -67,11 +68,11 @@ export default function Chat() {
     return unsubscribe;
   }, []);
 
+  // the function send the messages to the database
   const onSend = useCallback((messages = []) => {
     setMessages((previousMessages) =>
       GiftedChat.append(previousMessages, messages)
     );
-    // setMessages([...messages, ...messages]);
     const { _id, createdAt, text, user } = messages[0];
     addDoc(collection(database, "chats"), {
       _id,
@@ -81,46 +82,57 @@ export default function Chat() {
     });
   }, []);
 
+  // the function render the send button
+  const renderSend = (props) => {
+    return (
+      <Send {...props}>
+        <View style={styles.sendButton}>
+          <Entypo name="chevron-right" size={24} color={colors.black} />
+        </View>
+      </Send>
+    );
+  };
+
+  // the function render the input toolbar
+  const renderInputToolbar = (props) => {
+    return (
+      <View style={styles.inputContainer}>
+        <Composer {...props} textInputStyle={styles.textInput} />
+        {renderSend(props)}
+      </View>
+    );
+  };
+
   return (
-    // <>
-    //   {messages.map(message => (
-    //     <Text key={message._id}>{message.text}</Text>
-    //   ))}
-    // </>
-    <>
+    <View style={styles.container}>
+      <GoBack />
+      <Signout />
       <ImageBackground
         source={{
-          uri: "https://cdn.pixabay.com/photo/2017/09/07/10/09/triangle-2724449_960_720.png",
+          uri: "https://images.pexels.com/photos/3695238/pexels-photo-3695238.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+          // uri: "https://cdn.pixabay.com/photo/2018/03/15/08/54/grid-3227459_960_720.jpg",
         }}
         resizeMode="cover"
         style={styles.image}
       >
-        <GiftedChat
-          messages={messages}
-          showAvatarForEveryMessage={false}
-          showUserAvatar={false}
-          onSend={(messages) => onSend(messages)}
-          placeholder="    Message"
-          textInputStyle={{
-            backgroundColor: "white",
-            borderRadius: 25,
-            elevation: 2,
-            marginBottom: 10,
-          }}
-          style={{ backgroundColor: "transparent" }}
-          user={{
-            _id: auth?.currentUser?.email,
-            avatar: "https://i.pravatar.cc/300",
-          }}
-        />
+        <View style={styles.chatContainer}>
+          <GiftedChat
+            messages={messages}
+            showAvatarForEveryMessage={false}
+            showUserAvatar
+            onSend={onSend}
+            placeholder="Message"
+            textInputStyle={styles.textInput}
+            renderSend={renderSend}
+            user={{
+              _id: auth?.currentUser?.email,
+              avatar: `https://i.pravatar.cc/${avatarNumber}`,
+            }}
+            renderInputToolbar={renderInputToolbar}
+            alwaysShowSend
+          />
+        </View>
       </ImageBackground>
-    </>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  image: {
-    flex: 1,
-    justifyContent: "center",
-  },
-});
