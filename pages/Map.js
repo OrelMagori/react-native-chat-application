@@ -1,17 +1,21 @@
 import React, { useState } from "react";
-import { API_KEY } from "../env.json";
-import { StyleSheet, View, Text } from "react-native";
+import { View, Text } from "react-native";
 import MapView, { Callout, Circle, Marker } from "react-native-maps";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
+import { API_KEY } from "../env.json";
+import { GoBack } from "../components/GoBack";
+import { Signout } from "../components/Signout";
+import { styles } from "../pagesStyle/Map.style";
 
-
-const Map = () =>{
+const Map = () => {
+  // the variable pin is used to set the pin on the map
   const [pin, setPin] = useState({
     latitude: 32.103376857642246,
     longitude: 35.20905301042528,
   });
 
+  // the variable region is used to set the region of the map
   const [region, setRegion] = useState({
     latitude: 32.103376857642246,
     longitude: 35.20905301042528,
@@ -21,9 +25,12 @@ const Map = () =>{
 
   return (
     <>
-      <View style={{ marginTop: 50, flex: 1 }}>
+      <View style={{ marginTop: 10, flex: 1 }}>
+        <GoBack />
+        <Signout />
+        {/* the GooglePlacesAutocomplete component is used to search for places */}
         <GooglePlacesAutocomplete
-          fetchDetails={true}
+          fetchDetails
           GooglePlacesSearchQuery={{
             rankby: "distance",
           }}
@@ -43,31 +50,20 @@ const Map = () =>{
             // components: "country: us",
             types: "establishment",
             radius: 40000,
-            location: `${region.latitude},${region.longitude}`,
+            location: `${region.latitude},${region.longitude}`, // the location is set to the region of the map
           }}
           styles={{
-            container: {
-              flex: 0,
-              position: "absolute",
-              width: "95%",
-              zIndex: 1,
-              alignItems: "center",
-            },
-            listView: { backgroundColor: "white" },
-            textInputContainer: {
-              alignItems: "center",
-              padding: 0,
-              justifyContent: "flex-start",
-              alignItems: "flex-start",
-            },
-            textInput: {
-              padding: 0,
-              margin: 0,
-              alignItems: "center",            },
+            container: styles.googlePlacesAutocompleteContainer,
+            listView: styles.googlePlacesAutocompleteListView,
+            textInputContainer:
+              styles.googlePlacesAutocompleteTextInputContainer,
+            textInput: styles.googlePlacesAutocompleteTextInput,
           }}
         />
+        {/* the MapView component is used to show the map */}
         <MapView
           style={styles.map}
+          //initialRegion is a prop that sets the initial region of the map
           initialRegion={{
             latitude: 32.103376857642246,
             longitude: 35.20905301042528,
@@ -76,6 +72,7 @@ const Map = () =>{
           }}
           provider="google" // for google maps insted of default map of the phone
         >
+          {/* the Marker component is used to show a pin on the map */}
           <Marker
             coordinate={{
               latitude: region.latitude,
@@ -85,7 +82,7 @@ const Map = () =>{
           <Marker
             coordinate={pin}
             pinColor="red"
-            draggable={true}
+            draggable
             onDragStart={(event) => {
               console.log("Drag start", event.nativeEvent.coordinate);
             }}
@@ -96,6 +93,7 @@ const Map = () =>{
               });
             }}
           >
+            {/* the Callout component is used to show a popup when the marker is pressed */}
             <Callout>
               <Text>I'm Here</Text>
             </Callout>
@@ -105,16 +103,7 @@ const Map = () =>{
       </View>
     </>
   );
-}
+};
 
 export default Map;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    width: "100%",
-    height: "100%",
-  },
-});

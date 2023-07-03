@@ -1,20 +1,30 @@
 import React, { useState, createContext, useContext, useEffect } from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { View, ActivityIndicator, ImageBackground } from "react-native";
+import {
+  View,
+  ActivityIndicator,
+  Keyboard,
+  KeyboardAvoidingView,
+} from "react-native";
+import { Entypo } from "@expo/vector-icons";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./config/firebase";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
+import colors from "./colors";
+import Map from "./pages/Map";
+import Home from "./pages/Home";
+import Chat from "./pages/Chat";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Chat from "./pages/Chat";
-import Home from "./pages/Home";
-import Map from "./pages/Map";
+import { auth } from "./config/firebase";
+// import { AuthStack } from "./components/AuthStack";
+// import { ChatStack } from './components/ChatStack';
 
-const Stack = createStackNavigator();
 const AuthenticatedUserContext = createContext({});
-const chatBackground = { uri: "../assets/chatBackground.jpg" };
 const AuthenticatedUserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+
+  // this return is the value of the context provider
   return (
     <AuthenticatedUserContext.Provider value={{ user, setUser }}>
       {children}
@@ -22,27 +32,125 @@ const AuthenticatedUserProvider = ({ children }) => {
   );
 };
 
+const Tab = createBottomTabNavigator();
+// the function is the navigation for the app
 function ChatStack() {
   return (
-    <Stack.Navigator defaultScreenOptions={Home}>
-      <Stack.Screen name="Home" component={Home} />
-      <Stack.Screen name="Map" component={Map} />
-      <Stack.Screen name="Chat" component={Chat} />
-    </Stack.Navigator>
+    <Tab.Navigator
+      defaultScreenOptions={Home}
+      tabBarOptions={{
+        keyboardHidesTabBar: true,
+      }}
+    >
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{
+          tabBarLabel: "Home",
+          tabBarIcon: () => (
+            <Entypo name="home" size={25} color={colors.black} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Chat"
+        component={Chat}
+        options={{
+          tabBarLabel: "Chat",
+          tabBarIcon: () => (
+            <Entypo name="chat" size={25} color={colors.black} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Map"
+        component={Map}
+        options={{
+          tabBarLabel: "Map",
+          tabBarIcon: () => (
+            <Entypo name="map" size={25} color={colors.black} />
+          ),
+        }}
+      />
+    </Tab.Navigator>
   );
 }
 
+// the function is the navigation for the login and signup pages
 function AuthStack() {
+  const [keyboardShown, setKeyboardShown] = useState(false);
+
+  // the useEffect is hide the tab bar when the keyboard is shown.
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setKeyboardShown(true);
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setKeyboardShown(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Signup" component={Signup} />
-    </Stack.Navigator>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+      keyboardShouldPersistTaps="handled"
+    >
+      <Tab.Navigator
+        screenOptions={{
+          headerShown: false,
+          tabBarHideOnKeyboard: true,
+          tabBarStyle: [
+            {
+              display: "flex",
+            },
+            null,
+          ],
+        }}
+      >
+        <Tab.Screen
+          name="Login"
+          component={Login}
+          options={{
+            tabBarLabel: "Login",
+            tabBarIcon: () => (
+              <Entypo name="login" size={25} color={colors.black} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Signup"
+          component={Signup}
+          options={{
+            tabBarLabel: "Signup",
+            tabBarIcon: () => (
+              <Entypo name="add-user" size={25} color={colors.black} />
+            ),
+          }}
+        />
+      </Tab.Navigator>
+    </KeyboardAvoidingView>
   );
 }
+
+// the function is the root navigation for the app
 function RootNavigator() {
   const { user, setUser } = useContext(AuthenticatedUserContext);
   const [isLoading, setIsLoading] = useState(true);
+
+  // the function is the listener for the user authentication
   useEffect(() => {
     // onAuthStateChanged returns an unsubscriber
     const unsubscribeAuth = onAuthStateChanged(
@@ -65,9 +173,7 @@ function RootNavigator() {
 
   return (
     <NavigationContainer>
-      <ImageBackground source={chatBackground} style={{ flex: 1 }}>
-        {user ? <ChatStack /> : <AuthStack />}
-      </ImageBackground>
+      {user ? <ChatStack /> : <AuthStack />}
     </NavigationContainer>
   );
 }
@@ -79,101 +185,3 @@ export default function App() {
     </AuthenticatedUserProvider>
   );
 }
-
-// import { View, ActivityIndicator } from "react-native";
-// import React, { createContext, useContext, useEffect, useState } from "react";
-// import { NavigationContainer } from "@react-navigation/native";
-// import { createStackNavigator } from "@react-navigation/stack";
-// import { onAuthStateChanged } from "firebase/auth";
-// import { auth } from "./config/firebase";
-
-// import Map from "./pages/Map";
-// import Home from "./pages/Home";
-// import Login from "./pages/Login";
-// import Signup from "./pages/Signup";
-// import Chat from "./pages/Chat";
-
-// const Stack = createStackNavigator();
-// const AuthenticatedUserContext = createContext({});
-
-// /**
-//  * For checking if we have a user or not
-//  */
-// const AuthenticatedUserProvider = ({ children }) => {
-//   const [user, setUser] = useState(null);
-//   return (
-//     <AuthenticatedUserContext.Provider value={{ user, setUser }}>
-//       {children}
-//     </AuthenticatedUserContext.Provider>
-//   );
-// };
-
-// function HomeStack() {
-//   return (
-//     <Stack.Navigator
-//       defaultScreenOptions={Home}
-//       screenOptions={{ headerShown: false }}
-//     >
-//       <Stack.Screen name="Home" component={Home} />
-//       <Stack.Screen name="Map" component={Map} />
-//       <Stack.Screen name="Chat" component={Chat} />
-//       {/* <Stack.Screen name="Logout" component={Login} /> */}
-//     </Stack.Navigator>
-//   );
-// }
-// function ChatStack() {
-//   return (
-//     <Stack.Navigator defaultScreenOptions={Home}>
-//       <Stack.Screen name="Home" component={Home} />
-//       <Stack.Screen name="Chat" component={Chat} />
-//     </Stack.Navigator>
-//   );
-// }
-
-// function AuthStack() {
-//   return (
-//     <Stack.Navigator
-//       defaultScreenOptions={Login}
-//       screenOptions={{ headerShown: false }}
-//     >
-//       <Stack.Screen name="Login" component={Login} />
-//       <Stack.Screen name="Signup" component={Signup} />
-//     </Stack.Navigator>
-//   );
-// }
-
-// function RootNavigator() {
-//   const { user, setUser } = useContext(AuthenticatedUserContext);
-//   const [loading, setLoading] = useState(true);
-
-//   useEffect(() => {
-//     const unsubscribe = onAuthStateChanged(auth, async (authenticatedUser) => {
-//       authenticatedUser ? setUser(authenticatedUser) : setUser(null);
-//       setLoading(false);
-//     });
-//     return () => unsubscribe();
-//   }, [user]);
-
-//   if (loading) {
-//     return (
-//       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-//         <ActivityIndicator size="large" />
-//       </View>
-//     );
-//   }
-
-//   return (
-//     <NavigationContainer>
-//       {user ? <HomeStack /> : <AuthStack />}
-//     </NavigationContainer>
-//   );
-
-// }
-
-// export default function App() {
-//   return (
-//     <AuthenticatedUserProvider>
-//       <RootNavigator />
-//     </AuthenticatedUserProvider>
-//   );
-// }
